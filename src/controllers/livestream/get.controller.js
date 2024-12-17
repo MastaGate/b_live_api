@@ -22,9 +22,9 @@ exports.getById = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const livestreams = await Livestream.find()
-      .populate('creator', 'username email')
-      .sort({ createdAt: -1 });
+    const livestreams = await Livestream.findAll()
+      // .populate('creator', 'username email')
+      // .sort({ createdAt: -1 });
 
     res.json(livestreams);
   } catch (error) {

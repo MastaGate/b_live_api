@@ -135,7 +135,7 @@ const server = https.createServer(options, app);
 
 // Utilisez une variable d'environnement pour l'adresse IP
 const HOST = process.env.HOST || "localhost";
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 server.listen(PORT, HOST, () => {
   console.log(`Serveur HTTPS démarré sur https://${HOST}:${PORT}`);

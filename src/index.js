@@ -49,7 +49,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: process.env.API_URL || 'https://localhost:3000',
+        url: 'http://146.190.175.116',
         description: 'Serveur API'
       }
     ],

@@ -138,7 +138,7 @@ const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 8000;
 
 server.listen(PORT, HOST, () => {
-  console.log(`Serveur HTTPS démarré sur https://${HOST}:${PORT}`);
-  console.log(`Documentation API disponible sur https://${HOST}:${PORT}/api-docs`);
+  console.log(`Le serveur HTTPS a démarré sur https://${HOST}:${PORT}`);
+  console.log(`Documentation de l'API disponible sur https://${HOST}:${PORT}/api-docs`);
 });
 

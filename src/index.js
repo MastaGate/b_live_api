@@ -125,7 +125,6 @@ app.use('/api/vods', vodRoutes);
 // Middleware de gestion d'erreurs
 app.use(errorHandler);
 
-
 // Configuration HTTPS
 const options = {
   key: fs.readFileSync('ssl-key.pem'),   // Clé privée
@@ -134,8 +133,12 @@ const options = {
 
 const server = https.createServer(options, app);
 
+// Utilisez une variable d'environnement pour l'adresse IP
+const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Serveur HTTPS démarré sur https://localhost:${PORT}`);
-  console.log(`Documentation API disponible sur https://localhost:${PORT}/api-docs`);
+
+server.listen(PORT, HOST, () => {
+  console.log(`Serveur HTTPS démarré sur https://${HOST}:${PORT}`);
+  console.log(`Documentation API disponible sur https://${HOST}:${PORT}/api-docs`);
 });
+

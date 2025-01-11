@@ -14,28 +14,44 @@ const { getById, getAll } = require('../controllers/livestream/get.controller');
  *     summary: Créer un nouveau livestream
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - contentId
- *               - title
- *             properties:
- *               contentId:
- *                 type: string
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               startTime:
- *                 type: string
- *                 format: date-time
- *               endTime:
- *                 type: string
- *                 format: date-time
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: photo
+ *         type: file
+ *         required: true
+ *         description: Image du livestream (max 5MB, format image uniquement)
+ *       - in: formData
+ *         name: contentId
+ *         type: string
+ *         required: true
+ *       - in: formData
+ *         name: title
+ *         type: string
+ *         required: true
+ *       - in: formData
+ *         name: description
+ *         type: string
+ *       - in: formData
+ *         name: startTime
+ *         type: string
+ *         format: date-time
+ *         required: true
+ *       - in: formData
+ *         name: endTime
+ *         type: string
+ *         format: date-time
+ *         required: true
+ *     responses:
+ *       201:
+ *         description: Livestream créé avec succès
+ *       400:
+ *         description: Données invalides
+ *       401:
+ *         description: Non authentifié
+ *       403:
+ *         description: Non autorisé
  */
 router.post('/', authenticate, authorize('admin'), createLivestream);
 
@@ -47,6 +63,43 @@ router.post('/', authenticate, authorize('admin'), createLivestream);
  *     summary: Mettre à jour un livestream
  *     security:
  *       - bearerAuth: []
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         type: string
+ *         required: true
+ *       - in: formData
+ *         name: photo
+ *         type: file
+ *         description: Image du livestream (max 5MB, format image uniquement)
+ *       - in: formData
+ *         name: contentId
+ *         type: string
+ *       - in: formData
+ *         name: title
+ *         type: string
+ *       - in: formData
+ *         name: description
+ *         type: string
+ *       - in: formData
+ *         name: startTime
+ *         type: string
+ *         format: date-time
+ *       - in: formData
+ *         name: endTime
+ *         type: string
+ *         format: date-time
+ *     responses:
+ *       200:
+ *         description: Livestream mis à jour avec succès
+ *       400:
+ *         description: Données invalides
+ *       401:
+ *         description: Non authentifié
+ *       403:
+ *         description: Non autorisé
  */
 router.put('/:id', authenticate, authorize('admin'), updateLivestream);
 

@@ -6,27 +6,39 @@ class Livestream {
     try {
       const docRef = db.collection(COLLECTION).doc();
       
-      // Gérer le téléchargement de la photo si elle existe
+      // Gérer le téléchargement de la photo
       let imageUrl = '';
-      if (data.photoBlob) {
+      if (data.photo) {
         const bucket = admin.storage().bucket();
-        const fileName = `livestreams/${docRef.id}/thumbnail_${Date.now()}.jpg`;
+        const fileName = `livestreams/${docRef.id}/thumbnail_${Date.now()}${data.photo.originalname}`;
         
         // Créer le fichier dans Firebase Storage
         const file = bucket.file(fileName);
-        await file.save(data.photoBlob, {
+        const stream = file.createWriteStream({
           metadata: {
-            contentType: 'image/jpeg',
-          }
+            contentType: data.photo.mimetype,
+          },
+          resumable: false
         });
 
-        // Générer une URL publique valide pendant 1 an
-        const [url] = await file.getSignedUrl({
-          action: 'read',
-          expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 an
+        // Gérer les erreurs de stream
+        await new Promise((resolve, reject) => {
+          stream.on('error', (error) => {
+            reject(error);
+          });
+
+          stream.on('finish', async () => {
+            // Rendre le fichier public
+            await file.makePublic();
+            
+            // Obtenir l'URL publique
+            imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+            resolve();
+          });
+
+          // Écrire le buffer du fichier dans le stream
+          stream.end(data.photo.buffer);
         });
-        
-        imageUrl = url;
       }
 
       const livestream = {

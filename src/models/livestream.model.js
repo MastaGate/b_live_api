@@ -1,4 +1,5 @@
 const { db, admin } = require('../config/firebase');
+const cloudinary = require('../config/cloudinary');
 const COLLECTION = 'livestreams';
 
 class Livestream {
@@ -9,36 +10,37 @@ class Livestream {
       // Gérer le téléchargement de la photo
       let imageUrl = '';
       if (data.photo) {
-        const bucket = admin.storage().bucket();
-        const fileName = `livestreams/${docRef.id}/thumbnail_${Date.now()}${data.photo.originalname}`;
-        
-        // Créer le fichier dans Firebase Storage
-        const file = bucket.file(fileName);
-        const stream = file.createWriteStream({
-          metadata: {
-            contentType: data.photo.mimetype,
-          },
-          resumable: false
-        });
+        try {
+          // Créer un stream à partir du buffer de l'image
+          const streamifier = require('streamifier');
+          const stream = streamifier.createReadStream(data.photo.buffer);
 
-        // Gérer les erreurs de stream
-        await new Promise((resolve, reject) => {
-          stream.on('error', (error) => {
-            reject(error);
-          });
-
-          stream.on('finish', async () => {
-            // Rendre le fichier public
-            await file.makePublic();
+          // Upload vers Cloudinary
+          const uploadResponse = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                folder: 'livestreams',
+                public_id: `${docRef.id}_${Date.now()}`,
+                resource_type: 'image',
+                transformation: [
+                  { width: 1280, height: 720, crop: 'limit' }, // HD resolution
+                  { quality: 'auto:good' } // Optimisation automatique de la qualité
+                ]
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            );
             
-            // Obtenir l'URL publique
-            imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
-            resolve();
+            stream.pipe(uploadStream);
           });
 
-          // Écrire le buffer du fichier dans le stream
-          stream.end(data.photo.buffer);
-        });
+          imageUrl = uploadResponse.secure_url;
+        } catch (error) {
+          console.error('Erreur lors du téléchargement de l\'image:', error);
+          throw new Error('Erreur lors du téléchargement de l\'image vers Cloudinary');
+        }
       }
 
       const livestream = {

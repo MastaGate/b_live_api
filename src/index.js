@@ -12,6 +12,7 @@ const authRoutes = require('./routes/auth.routes');
 const livestreamRoutes = require('./routes/livestream.routes');
 const vodRoutes = require('./routes/vod.routes');
 const { errorHandler } = require('./middleware/error.middleware');
+const { verifyCloudinaryConfig } = require('./config/cloudinary');
 
 const app = express();
 
@@ -138,14 +139,18 @@ const server = https.createServer(options, app);
 const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, HOST, () => {
-  console.log(`Le serveur HTTPS a démarré sur https://${HOST}:${PORT}`);
-  console.log(`Documentation de l'API disponible sur https://${HOST}:${PORT}/api-docs`);
+// Vérifier la configuration Cloudinary avant de démarrer le serveur
+verifyCloudinaryConfig().then(() => {
+  server.listen(PORT, HOST, () => {
+    console.log(`Le serveur HTTPS a démarré sur https://${HOST}:${PORT}`);
+    console.log(`Documentation de l'API disponible sur https://${HOST}:${PORT}/api-docs`);
+  });
+}).catch(error => {
+  console.error('Erreur lors du démarrage du serveur:', error);
+  process.exit(1);
 });
 
-
 // const port = 80;
-
 
 // app.listen(port, () => {
 //   console.log('Express server démarré sur le port '  + port);

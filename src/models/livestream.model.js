@@ -1,5 +1,5 @@
 const { db, admin } = require('../config/firebase');
-const cloudinary = require('../config/cloudinary');
+const { cloudinary } = require('../config/cloudinary');
 const COLLECTION = 'livestreams';
 
 class Livestream {
@@ -11,35 +11,31 @@ class Livestream {
       let imageUrl = '';
       if (data.photo) {
         try {
-          // Créer un stream à partir du buffer de l'image
-          const streamifier = require('streamifier');
-          const stream = streamifier.createReadStream(data.photo.buffer);
+          console.log('Début upload Cloudinary...');
+          // Upload direct du buffer vers Cloudinary
+          const uploadResponse = await cloudinary.uploader.upload(
+            `data:${data.photo.mimetype};base64,${data.photo.buffer.toString('base64')}`,
+            {
+              folder: 'livestreams',
+              public_id: `${docRef.id}_${Date.now()}`,
+              resource_type: 'auto',
+              timeout: 60000, // 60 secondes de timeout
+              transformation: [
+                { width: 800, height: 900, crop: 'limit' },
+                { quality: 'auto:good' }
+              ]
+            }
+          );
 
-          // Upload vers Cloudinary
-          const uploadResponse = await new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-              {
-                folder: 'livestreams',
-                public_id: `${docRef.id}_${Date.now()}`,
-                resource_type: 'image',
-                transformation: [
-                  { width: 1280, height: 720, crop: 'limit' }, // HD resolution
-                  { quality: 'auto:good' } // Optimisation automatique de la qualité
-                ]
-              },
-              (error, result) => {
-                if (error) reject(error);
-                else resolve(result);
-              }
-            );
-            
-            stream.pipe(uploadStream);
-          });
+          if (!uploadResponse || !uploadResponse.secure_url) {
+            throw new Error('Réponse Cloudinary invalide');
+          }
 
           imageUrl = uploadResponse.secure_url;
+          console.log('Image uploadée avec succès:', imageUrl);
         } catch (error) {
-          console.error('Erreur lors du téléchargement de l\'image:', error);
-          throw new Error('Erreur lors du téléchargement de l\'image vers Cloudinary');
+          console.error('Détails de l\'erreur Cloudinary:', error);
+          throw new Error(`Erreur lors de l'upload de l'image: ${error.message || 'Erreur inconnue'}`);
         }
       }
 

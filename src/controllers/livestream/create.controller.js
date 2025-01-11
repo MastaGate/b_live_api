@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
       }
 
       const { contentId, title, description, startTime, endTime } = req.body;
-      console.log(`** data sent: ${contentId} - ${title} - ${description}`);
+      console.log(`** data sent: ${title} `);
 
       // Validation de req.user
       if (!req.user || !req.user.id) {

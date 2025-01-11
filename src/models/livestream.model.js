@@ -44,6 +44,7 @@ class Livestream {
         contentId: data.contentId,
         title: data.title,
         description: data.description || '',
+        category: data.category || 'other', // Ajout du champ category avec valeur par défaut
         imageUrl: imageUrl,
         status: data.status || 'scheduled',
         startTime: data.startTime,

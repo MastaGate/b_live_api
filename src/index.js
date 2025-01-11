@@ -49,7 +49,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://146.190.175.116',
+        // url: 'http://146.190.175.116',
+        url: 'http://localhost',
         description: 'Serveur API'
       }
     ],
@@ -134,17 +135,18 @@ const options = {
 const server = https.createServer(options, app);
 
 // Utilisez une variable d'environnement pour l'adresse IP
-// const HOST = process.env.HOST || "localhost";
-// const PORT = process.env.PORT || 8000;
+const HOST = process.env.HOST || "localhost";
+const PORT = process.env.PORT || 3000;
 
-// server.listen(PORT, HOST, () => {
-//   console.log(`Le serveur HTTPS a démarré sur https://${HOST}:${PORT}`);
-//   console.log(`Documentation de l'API disponible sur https://${HOST}:${PORT}/api-docs`);
-// });
-
-
-const port = 80;
-
-app.listen(port, () => {
-  console.log('Express server démarré sur le port ' + port);
+server.listen(PORT, HOST, () => {
+  console.log(`Le serveur HTTPS a démarré sur https://${HOST}:${PORT}`);
+  console.log(`Documentation de l'API disponible sur https://${HOST}:${PORT}/api-docs`);
 });
+
+
+// const port = 80;
+
+
+// app.listen(port, () => {
+//   console.log('Express server démarré sur le port '  + port);
+// });

@@ -1,25 +1,54 @@
 const { db, admin } = require('../config/firebase');
-
 const COLLECTION = 'livestreams';
 
 class Livestream {
   static async create(data) {
-    const docRef = db.collection(COLLECTION).doc();
-    const livestream = {
-      id: docRef.id,
-      contentId: data.contentId,
-      title: data.title,
-      description: data.description,
-      status: data.status || 'scheduled',
-      startTime: data.startTime,
-      endTime: data.endTime,
-      creatorId: data.creatorId,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    };
+    try {
+      const docRef = db.collection(COLLECTION).doc();
+      
+      // Gérer le téléchargement de la photo si elle existe
+      let imageUrl = '';
+      if (data.photoBlob) {
+        const bucket = admin.storage().bucket();
+        const fileName = `livestreams/${docRef.id}/thumbnail_${Date.now()}.jpg`;
+        
+        // Créer le fichier dans Firebase Storage
+        const file = bucket.file(fileName);
+        await file.save(data.photoBlob, {
+          metadata: {
+            contentType: 'image/jpeg',
+          }
+        });
 
-    await docRef.set(livestream);
-    return livestream;
+        // Générer une URL publique valide pendant 1 an
+        const [url] = await file.getSignedUrl({
+          action: 'read',
+          expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 an
+        });
+        
+        imageUrl = url;
+      }
+
+      const livestream = {
+        id: docRef.id,
+        contentId: data.contentId,
+        title: data.title,
+        description: data.description || '',
+        imageUrl: imageUrl,
+        status: data.status || 'scheduled',
+        startTime: data.startTime,
+        endTime: data.endTime,
+        creatorId: data.creatorId,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+
+      await docRef.set(livestream);
+      return livestream;
+    } catch (error) {
+      console.error('Erreur lors de la création du livestream:', error);
+      throw error;
+    }
   }
 
   static async findById(id) {

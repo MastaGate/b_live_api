@@ -22,9 +22,9 @@ exports.getById = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const vods = await VOD.find()
-      .populate('creator', 'username email')
-      .sort({ createdAt: -1 });
+    const vods = await VOD.findAll()
+      // .populate('creator', 'username email')
+      // .sort({ createdAt: -1 });
 
     res.json(vods);
   } catch (error) {
@@ -34,3 +34,18 @@ exports.getAll = async (req, res) => {
     });
   }
 };
+
+// exports.getAll = async (req, res) => {
+//   try {
+//     const livestreams = await Livestream.findAll()
+//       // .populate('creator', 'username email')
+//       // .sort({ createdAt: -1 });
+
+//     res.json(livestreams);
+//   } catch (error) {
+//     res.status(400).json({
+//       message: 'Erreur lors de la récupération des livestreams',
+//       error: error.message
+//     });
+//   }
+// };

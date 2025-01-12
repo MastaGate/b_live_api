@@ -137,13 +137,13 @@ const options = {
 const server = https.createServer(options, app);
 
 // Utilisez une variable d'environnement pour l'adresse IP
-const HOST = process.env.HOST || "localhost";
-const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || 'localhost';
+const PORT = process.env.PORT || 4000;
 
 // Vérifier la configuration Cloudinary avant de démarrer le serveur
 verifyCloudinaryConfig().then(() => {
-  server.listen(PORT, HOST, () => {
-    console.log(`Le serveur HTTPS a démarré sur https://${HOST}:${PORT}`);
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`Le serveur HTTPS a démarré sur le port${PORT}`);
     console.log(`Documentation de l'API disponible sur https://${HOST}:${PORT}/api-docs`);
   });
 }).catch(error => {
@@ -155,4 +155,16 @@ verifyCloudinaryConfig().then(() => {
 
 // app.listen(port, () => {
 //   console.log('Express server démarré sur le port '  + port);
+// });
+
+
+// const port = 80;
+// verifyCloudinaryConfig().then(() => {
+//   app.listen(HOST, PORT, () => {
+//     console.log(`Le serveur HTTPS a démarré sur https://${HOST}:${PORT}`);
+//     console.log(`Documentation de l'API disponible sur https://${HOST}:${PORT}/api-docs`);
+//   });
+// }).catch(error => {
+//   console.error('Erreur lors du démarrage du serveur:', error);
+//   process.exit(1);
 // });

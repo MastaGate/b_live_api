@@ -50,8 +50,9 @@ const swaggerOptions = {
     },
     servers: [
       {
+        url: 'http://46.202.195.61',
         // url: 'http://146.190.175.116',
-        url: 'http://localhost',
+        // url: 'http://localhost',
         description: 'Serveur API'
       }
     ],

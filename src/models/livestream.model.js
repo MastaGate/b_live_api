@@ -3,8 +3,55 @@ const { cloudinary } = require('../config/cloudinary');
 const COLLECTION = 'livestreams';
 
 class Livestream {
+  static validateLivestreamData(data) {
+    const errors = [];
+
+    // Validation de contentId (doit être une URL valide)
+    if (!data.contentId) {
+      errors.push('Le champ contentId est requis');
+    } else {
+      try {
+        new URL(data.contentId);
+      } catch (e) {
+        errors.push('Le champ contentId doit être une URL valide');
+      }
+    }
+
+    // Validation de location (obligatoire)
+    if (!data.location) {
+      errors.push('Le champ location est requis');
+    }
+
+    // Validation de startTime et endTime (doivent être des chaînes DateTime valides)
+    const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(.\d{3})?([+-]\d{2}:\d{2}|Z)?$/;
+    
+    if (!data.startTime || !dateTimeRegex.test(data.startTime)) {
+      errors.push('Le champ startTime doit être une date-heure valide (format ISO 8601)');
+    }
+
+    if (!data.endTime || !dateTimeRegex.test(data.endTime)) {
+      errors.push('Le champ endTime doit être une date-heure valide (format ISO 8601)');
+    }
+
+    // Vérifier si endTime est après startTime
+    if (data.startTime && data.endTime) {
+      const start = new Date(data.startTime);
+      const end = new Date(data.endTime);
+      if (end <= start) {
+        errors.push('La date de fin doit être postérieure à la date de début');
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new Error(errors.join('; '));
+    }
+  }
+
   static async create(data) {
     try {
+      // Valider les données avant de créer le livestream
+      this.validateLivestreamData(data);
+
       const docRef = db.collection(COLLECTION).doc();
       
       // Gérer le téléchargement de la photo
@@ -49,6 +96,7 @@ class Livestream {
         status: data.status || 'scheduled',
         startTime: data.startTime,
         endTime: data.endTime,
+        location: data.location, // Ajout du champ location obligatoire
         creatorId: data.creatorId,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),

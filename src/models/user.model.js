@@ -5,6 +5,12 @@ const COLLECTION = 'users';
 
 class User {
   static async create(userData) {
+    // Vérifier si l'email existe déjà
+    const existingUser = await this.findByEmail(userData.email);
+    if (existingUser) {
+      throw new Error('Un utilisateur avec cet email existe déjà');
+    }
+
     // Hachage du mot de passe avant d'ajouter l'utilisateur
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const userRef = db.collection(COLLECTION).doc();  // Créer une référence de document

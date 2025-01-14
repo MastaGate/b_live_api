@@ -37,7 +37,22 @@ class Livestream {
     if (data.startTime && data.endTime) {
       const start = new Date(data.startTime);
       const end = new Date(data.endTime);
-      if (end <= start) {
+      
+      // Comparer uniquement les heures si c'est la même date
+      const sameDate = start.getFullYear() === end.getFullYear() &&
+                      start.getMonth() === end.getMonth() &&
+                      start.getDate() === end.getDate();
+
+      if (sameDate) {
+        // Si même date, vérifier que l'heure de fin est postérieure
+        const startHours = start.getHours() * 60 + start.getMinutes();
+        const endHours = end.getHours() * 60 + end.getMinutes();
+        
+        if (endHours <= startHours) {
+          errors.push('Pour une même date, l\'heure de fin doit être postérieure à l\'heure de début');
+        }
+      } else if (end < start) {
+        // Si dates différentes, vérifier que la date de fin est postérieure
         errors.push('La date de fin doit être postérieure à la date de début');
       }
     }

@@ -142,9 +142,9 @@ const PORT = process.env.PORT || 4000;
 
 // Vérifier la configuration Cloudinary avant de démarrer le serveur
 verifyCloudinaryConfig().then(() => {
-  server.listen(PORT, "0.0.0.0", () => {
-    console.log(`Le serveur HTTPS fonctionne sur https://api.b-live-app.com:${PORT}`);
-    console.log(`Documentation de l'API disponible sur https://api.b-live-app.com:${PORT}/api-docs`);
+  server.listen(443, "0.0.0.0", () => {
+    console.log(`Le serveur HTTPS fonctionne sur https://api.b-live-app.com}`);
+    console.log(`Documentation de l'API disponible sur https://api.b-live-app.com/api-docs`);
   });
 }).catch(error => {
   console.error('Erreur lors du démarrage du serveur:', error);

@@ -130,8 +130,8 @@ app.use(errorHandler);
 
 // Configuration HTTPS
 const options = {
-  key: fs.readFileSync('ssl-key.pem'),   // Clé privée
-  cert: fs.readFileSync('ssl-cert.pem')  // Certificat SSL
+  key: fs.readFileSync('/etc/letsencrypt/live/api.b-live-app.com/privkey.pem'),   // Clé privée
+  cert: fs.readFileSync('/etc/letsencrypt/live/api.b-live-app.com/fullchain.pem')  // Certificat SSL
 };
 
 const server = https.createServer(options, app);
@@ -143,8 +143,8 @@ const PORT = process.env.PORT || 4000;
 // Vérifier la configuration Cloudinary avant de démarrer le serveur
 verifyCloudinaryConfig().then(() => {
   server.listen(PORT, "0.0.0.0", () => {
-    console.log(`Le serveur HTTPS a démarré sur le port${PORT}`);
-    console.log(`Documentation de l'API disponible sur https://${HOST}:${PORT}/api-docs`);
+    console.log(`Le serveur HTTPS fonctionne sur https://api.b-live-app.com:${PORT}`);
+    console.log(`Documentation de l'API disponible sur https://api.b-live-app.com:${PORT}/api-docs`);
   });
 }).catch(error => {
   console.error('Erreur lors du démarrage du serveur:', error);
